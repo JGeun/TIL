@@ -2,7 +2,7 @@
 
 순환 참조란 두 가지 이상의 객체가 서로에 대한 참조 상태를 가지고 있을 때 발생하며, 순환 참조가 발생하게 되면 서로에 대한 참조가 해제되지 않기 때문에 메모리에서 유지되며 이로 인한 메모리 leak이 발생하게 됩니다.
 
-<span style="color: #2D3748; background-color:#fff5b1;">아래 그림과 같이 빨간 줄이 순환참조를 발생시키는 원인입니다.</span>
+<span style="background-color:#fff5b1">아래 그림과 같이 빨간 줄이 순환참조를 발생시키는 원인입니다.</span>
 
 ![순환 참조](img/circular%20dependency.png)
 
