@@ -192,5 +192,3 @@ class Main {
 https://coding-factory.tistory.com/711
 
 https://icksw.tistory.com/248
-
-좋아요공감 공유하기통계게시글 관리
