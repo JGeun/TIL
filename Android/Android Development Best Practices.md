@@ -156,3 +156,79 @@ gradlew lint
 Leak canary와 같은 메모리 도구를 사용해서 메모리 누수의 원인을 감지하세요.
 
 안드로이드 프레임워크의 내부에 대한 지식은 각 누출의 원인을 좁힐 수 있는 독특한 능력을 제공하여 개발자들이 OutOfMemoryError 충돌을 극적으로 줄일 수 있도록 도와줍니다.
+
+#### 11) 앱의 구성 변경 사항을 처리합니다.
+
+때때로 Activity, Fragment 또는 AsyncTasks의 orientation 변경을 처리하는 것이 가장 짜증나는 일이 됩니다. orientation 변경이 제대로 처리되지 않으면 응용 프로그램의 예기치
+않은 동작이 발생합니다.
+
+이러한 변경이 발생하면 Android는 실행 중인 활동을 다시 시작합니다. 즉, 작업을 삭제하고 다시 만듭니다.
+
+orientation 변경을 처리할 수 있는 다양한 옵션이 있습니다.
+
+1. 화면 방향을 제한한다.
+
+2. 활동이 다시 생성되지 않도록 합니다.
+
+3. 기본 상태를 저장합니다.
+
+4. 복잡한 객체들을 저장합니다.
+
+#### 12) 클라이언트의 입력 양식과 같은 화면에서만 유효성 검사를 수행하세요.
+
+사용자 이메일이 유효한지 또는 사용자의 연락처가 필수 길이인지와 같은 검증을 위해 백엔드에 요청을 해야하나요?
+
+이런 경우를 고려하고 그에 맞게 로직을 구현하세요.
+
+#### 13) activities에 대한 참조를 만들지 마세요. 이것은 activities들이 완료될 때 수거되는 가비지가 되는 것을 방해합니다.
+
+매우 간단한 시나리오를 고려해 보세요. 활동에서 local broadcast receiver를 등록해야 합니다. 만약 broadcast receiver를 등록 취소하지 않으면, activity가 종료되더라도
+activity에 대한 참조가 유지됩니다.
+
+어떻게 해결할까요? 항상 activity의 onStop() 에서 receiver를 취소하는 걸 호출해야한다는 걸 기억하면 됩니다.
+
+#### 14) 암시적 인텐트로 App Chosser를 사용하고 항상 NoActivityFound Exception을 처리합니다.
+
+여러 앱이 intent에 응답할 수 있고 사용자가 매번 다른 앱을 사용하길 원하는 경우, 선택 대화상자를 명시적으로 표시해야 합니다.
+
+또한 어떤 이유로든 사용할 수 있는 앱이 없는 경우, 앱이 중단되서는 안됩니다. try/catch를 통해 처리하고 사용자에게 토스트 메세지를 보여주세요.
+
+#### 15) 모든 중요한 정보는 gradle.properties에 저장하고 버전 제어 시스템(git과 같은 시스템)에 넣지 마세요.
+
+이렇게 하지마세요. 이러면 version control system에 나타나게 됩니다.
+
+```kotlin
+signingConfigs {
+    release {
+// DON'T DO THIS!!
+        storeFile file ("myapp.keystore")
+        storePassword "password123"
+        keyAlias "thekey"
+        keyPassword "password789"
+    }
+}
+```
+
+대신, garlde.properties 파일을 만드세요
+
+```kotlin
+KEYSTORE_PASSWORD = password123
+KEY_PASSWORD = password789
+```
+
+파일이 자동적으로 Gradle에 의해 생성됩니다. build.gradle에서 다음과 같이 사용할 수 있습니다.
+
+```kotlin
+signingConfigs {
+    release {
+        try {
+            storeFile file ("myapp.keystore")
+            storePassword KEYSTORE_PASSWORD
+                    keyAlias "thekey"
+            keyPassword KEY_PASSWORD
+        } catch (ex) {
+            throw new InvalidUserDataException ("You should define KEYSTORE_PASSWORD and KEY_PASSWORD in gradle.properties.")
+        }
+    }
+}
+```
