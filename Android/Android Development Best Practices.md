@@ -232,3 +232,41 @@ signingConfigs {
     }
 }
 ```
+
+#### 16) 중간자 공격 (MITM - Man-in-the-midlle Attack)을 막기 위해 SSL 인증서 고정(pinning)을 구현하세요.
+
+요청을 차단하기 위해 대부분 프록시 도구를 사용합니다. 프록시 도구는 장치에 자체 인증서를 설치하고 application은 해당 인증서를 유효한 인증서로 신뢰하며 프록시 도구가 application 트래픽을 가로채도록 허용합니다. 이런식으로 우리는 해커들이 우리 데이터를 조작하거나 알 수 있도록 돕게됩니다.
+
+SSL 고정 구현을 활용하면 application이 사용자 지정 인증서를 신뢰하지 않으며 프록시 도구가 트래픽을 가로채도록 허용하지 않습니다.
+
+클라이언트측 서버 인증서 검증에 따라 달라지는 방식입니다. 여기서 더 읽어보세요.
+
+#### 17) SafetyNet Attestation API를 사용하여 서버가 진짜 안드로이드 장치에서 실행 중인 정품 앱과 상호작용하는지 확인하세요. (현재 SafetyNet Attestation API는 deprecated 되었습니다. Play Integrity API를 참고해주세요!)
+
+API는 다음 사항을 확인합니다:
+
+- 장치가 최고 관리자 권한 root가 도용될 수 있는지
+
+- 장치가 모니터링되고 있는지
+
+- 장치가 hard parameters를 인식했는지
+
+- 소프트웨어가 Android와 호환되는지
+
+- 장치가 악성 앱으로 부터 자유로운지
+
+구현하기 전에 수행해야할 사항과 하지말아야할 사항을 확인하세요.
+
+#### 18) 인증 토큰 등과 같은 중요한 정보를 저장하려면 SharedPreferences 대신 EncryptedSharedPreferences를 사용하세요.
+
+#### 19) Android Keystore 시스템을 사용하여 데이터베이스 등의 스토리지에서 중요한 정보를 저장하고 검색하세요.
+
+Android ketstore는 안전한 시스템 수준의 credential 저장소입니다. keystore를 사용하여 앱은 새로운 Private/Public 키 페어를 생성할 수 있고 이것을 사용해서 application 암호를 개인 저장소 폴더에 저장하기 전에 암호화합니다.
+AarogyaSetu를 개발하면서, 저는 매우 민감한 정보를 암호화하고 해독하기 위해 Keystore를 사용하는 것에 대해 배웠습니다. 여기서 구현된 부분을 확인할 수 있습니다.
+
+참고: 기본적으로 켜져있는 Android Backup 메커니즘이 있습니다. Android는 앱 데이터를 사용자의 Google Drive에 업로드하여 보존합니다.앱 데이터는 사용자의 Google 계정 credentials으로 보호되며 다른 장치들에서 같은 credentials를 쉽게 다운로드할 수 있습니다. 하지만 Android Keystore를 사용하여 암호화한 경우 cypher key는 오직 특정 장치에만 사용되므로 복원할 수 없습니다. 우리는 ios와 keychain과 같은 keystore를 위한 동기화 매커니즘이 없습니다. 더 좋은 방법은 백엔드에 저장하는 것입니다.
+
+#### 20) Google Play 서비스 메서드를 호출하기 위해 default security provider에서 발견된 취약점으로 부터 보호하기 위한 최신 업데이트가 있는 장치에서 앱이 실행되고 있는지 확인하세요
+
+예를 들어 OpenSSL에서 발견된 취약점(CVE-2014-0224)은 어느 쪽도 모르게 보안 트래픽을 해독하는 "man-in-the-middle" 공격을 받을 수 있습니다. Google Play 서비스 버전 5.0에서는 수정 프로그램을 사용할 수 있지만 앱은 수정 프로그램이 설치되어 있는지 확인해야 합니다. Google Play 서비스 방법을 사용하면 앱이 해당 공격으로부터 보호된 장치에서 실행되고 있는지 확인할 수 있습니다.
+이러한 취약점에 대비해 보호하기 위해, Google Play 서비스들은 장치의 보안 제공자를 자동으로 업데이트하여 알려진 공격으로부터 보호하는 방법을 제공합니다. 여기서 더 읽어보세요.
