@@ -26,3 +26,44 @@ Background Service는 <b>사용자에게 직접 보이지 않는 작업을 수�
 심지어 이와 같은 작업을 <b>여러 프로세스에 걸쳐 프로세스 간 통신(IPC)으로 수행</b>할 수도 있습니다. 
 바인딩된 서비스는 <b>또 다른 애플리케이션 구성 요소가 이에 바인딩되어 있는 경우에만 실행</b>됩니다.
 <b>여러 개의 구성 요소가 서비스에 한꺼번에 바인딩될 수도 있지만, 이 모든 것에서 바인딩이 해제되면 해당 서비스는 소멸</b>됩니다.
+
+### Service의 생명주기
+
+#### 백그라운드 서비스
+
+startService(): 서비스를 실행한다.
+onCreate(): 서비스가 최초 생성될 때 한 번 호출. 이미 실행 중인 서비스라면 이 함수는 호출X
+onStartCommand(): 앱의 다른 구성 요소에서 서비스를 실행하면 이 함수가 호출. 이 함수가 호출되면 서비스가 실행된 것이며 백그라운드에서 작업을 수행
+onDestrop(): 서비스가 소멸될 때 호출
+stopSelf(): 서비스가 스스로 중단
+stopService(): 다른 구성 요소가 서비스를 중단
+
+
+#### 바인드 서비스
+bindService(): 서비스에 바인딩할 때 사용
+unbindService(): 서비스를 언바이딩할 때 사용
+onBind(): 다른 구성 요소가 서비스에 바인딩되면 호출
+onRebind(): (onUnbind() 함수의 리턴값이 true인 경우) unbind된 후에 서비스 실행 중일 때 다시 bind시 호출
+onUnbind(): unbindService() 호출 시 호출된다.
+
+(서비스를 호출한 구성 요소)
+onServiceConnected(): 서비스에 바인드 되었을 때 호출
+onServiceDisconnected(): 서비스를 호스팅하는 프로세스가 중단되거나 종료되어 예기치 않게 서비스에 연결이 끊어졌을 때 호출. 클라이언트가 언바인딩할 때는 호출X
+
+
+#### IntentService
+
+IntentService는 Service의 하위 클래스로, 작업자 스레드를 사용하여 모든 시작 요청을 처리하되 한 번에 하나씩 처리합니다. 서비스가 여러 개의 요청을 동시에 처리하지 않아도 되는 경우에는 최선의 옵션입니다.
+
+기본 스레드와는 별개로 onStartCommand()에 전달된 모든 인텐트 실행을 위한 작업 스레드를 생성합니다. 전달된 인텐트는 작업을 위한 큐에 순차적으로 쌓이고 루퍼에 의해서 차례로 onHandleIntent()에 전달됩니다. 
+onHandleIntent()에서 작업이 완료되면 서비스를 종료합니다. 따라서 별도의 멀티 스레딩 처리를 고민하지 않아도 됩니다.
+
+다른 함수는 오버라이딩하지 않아도 되지만 onStartCommand()는 반드시 오버라이딩을 하고 super.onStartCommand()를 호출해야 한다. 일반 서비스에 비해서는 함수가 적어 훨씬 간결합니다.
+
+onStartCommand(): 인텐트를 작업 큐로 보낸 후 onHandleIntent()를 호출
+onHandleIntent(): 워커 스레드에 의해 순차적으로 호출되어 필요한 작업을 수행
+
+예시 코드
+https://github.com/JGeun/Android_Study/tree/master/MusicService
+
+ 
